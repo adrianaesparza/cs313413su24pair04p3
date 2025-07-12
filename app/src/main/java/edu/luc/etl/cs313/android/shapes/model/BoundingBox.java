@@ -16,10 +16,6 @@ public class BoundingBox implements Visitor<Location> {
     @Override
     public Location onFill(final Fill f) {
         Location bbox = f.getShape().accept(this);
-        if (bbox == null) {
-            throw new IllegalStateException("Null bounding box returned from Fill shape: " +
-                    f.getShape().getClass().getName());
-        }
         return bbox;
     }
 
@@ -32,9 +28,6 @@ public class BoundingBox implements Visitor<Location> {
 
         for (Shape s : g.getShapes()) {
             Location bbox = s.accept(this);
-            if (bbox == null) {
-                throw new IllegalStateException("Null bbox for shape in Group: " + s.getClass().getName());
-            }
             int x = bbox.getX();
             int y = bbox.getY();
             Rectangle r = (Rectangle) bbox.getShape();
@@ -56,14 +49,7 @@ public class BoundingBox implements Visitor<Location> {
     @Override
     public Location onLocation(final Location l) {
         Shape innerShape = l.getShape();
-        if (innerShape == null) {
-            throw new IllegalStateException("Location contains null inner shape!");
-        }
         Location innerBBox = innerShape.accept(this);
-        if (innerBBox == null) {
-            throw new IllegalStateException("Bounding box null from shape inside Location: " +
-                    innerShape.getClass().getName());
-        }
         return new Location(
                 innerBBox.getX() + l.getX(),
                 innerBBox.getY() + l.getY(),
@@ -79,28 +65,14 @@ public class BoundingBox implements Visitor<Location> {
     @Override
     public Location onStrokeColor(final StrokeColor c) {
         Shape innerShape = c.getShape();
-        if (innerShape == null) {
-            throw new IllegalStateException("StrokeColor contains null inner shape!");
-        }
         Location bbox = innerShape.accept(this);
-        if (bbox == null) {
-            throw new IllegalStateException("Bounding box null from shape inside StrokeColor: " +
-                    innerShape.getClass().getName());
-        }
         return bbox;
     }
 
     @Override
     public Location onOutline(final Outline o) {
         Shape innerShape = o.getShape();
-        if (innerShape == null) {
-            throw new IllegalStateException("Outline contains null inner shape!");
-        }
         Location bbox = innerShape.accept(this);
-        if (bbox == null) {
-            throw new IllegalStateException("Bounding box null from shape inside Outline: " +
-                    innerShape.getClass().getName());
-        }
         return bbox;
     }
 

@@ -17,8 +17,8 @@ public class Draw implements Visitor<Void> {
     private final Paint paint;
 
     public Draw(final Canvas canvas, final Paint paint) {
-        this.canvas = null; // FIXME
-        this.paint = null; // FIXME
+        this.canvas = canvas;
+        this.paint = paint;
         paint.setStyle(Style.STROKE);
     }
 
@@ -30,50 +30,80 @@ public class Draw implements Visitor<Void> {
 
     @Override
     public Void onStrokeColor(final StrokeColor c) {
-
+        int previousColor = paint.getColor();
+        paint.setColor(c.getColor());
+        c.getShape().accept(this);
+        paint.setColor(previousColor);
         return null;
     }
 
     @Override
     public Void onFill(final Fill f) {
-
+        Style previousStyle = paint.getStyle();
+        paint.setStyle(Style.FILL_AND_STROKE);
+        f.getShape().accept(this);
+        paint.setStyle(previousStyle);
         return null;
     }
 
     @Override
     public Void onGroup(final Group g) {
-
+        for (Shape s : g.getShapes()) {
+            s.accept(this);
+        }
         return null;
     }
 
     @Override
     public Void onLocation(final Location l) {
-
+        canvas.translate(l.getX(), l.getY());
+        l.getShape().accept(this);
+        canvas.translate(-l.getX(), -l.getY());
         return null;
     }
 
     @Override
     public Void onRectangle(final Rectangle r) {
-
+        canvas.drawRect(0, 0, r.getWidth(), r.getHeight(), paint);
         return null;
     }
 
     @Override
     public Void onOutline(Outline o) {
-
+        Style previousStyle = paint.getStyle();
+        paint.setStyle(Style.STROKE);
+        o.getShape().accept(this);
+        paint.setStyle(previousStyle);
         return null;
     }
 
     @Override
     public Void onPolygon(final Polygon s) {
 
-        final float[] pts = null;
+        final var points = s.getPoints();
+        if (points.size() < 2) {
+            return null;
+        }
+
+        final float[] pts = new float[points.size() * 4];
+
+        int i = 0;
+        for (int j = 0; j < points.size(); j++) {
+            Point p1 = points.get(j);
+            Point p2 = points.get((j + 1) % points.size());
+
+            pts[i++] = p1.getX();
+            pts[i++] = p1.getY();
+            pts[i++] = p2.getX();
+            pts[i++] = p2.getY();
+        }
 
         canvas.drawLines(pts, paint);
         return null;
     }
     @Override
     public Void onPoint(final Point p) {
+        canvas.drawPoint(0, 0, paint);
         return null;
     }
 
