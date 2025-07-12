@@ -7,7 +7,10 @@ public class Point extends Location {
 
     public Point(final int x, final int y) {
         super(x, y, new Circle(0));
-        assert x >= 0;
-        assert y >= 0;
+    }
+
+    @Override
+    public <T> T accept(final Visitor<T> v) {
+        return v.onPoint(this);
     }
 }

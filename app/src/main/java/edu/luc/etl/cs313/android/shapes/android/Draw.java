@@ -72,4 +72,9 @@ public class Draw implements Visitor<Void> {
         canvas.drawLines(pts, paint);
         return null;
     }
+    @Override
+    public Void onPoint(final Point p) {
+        return null;
+    }
+
 }

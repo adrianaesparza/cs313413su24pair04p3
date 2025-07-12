@@ -13,4 +13,5 @@ public interface Visitor<Result> {
     Result onLocation(Location l);
     Result onOutline(Outline o);
     Result onPolygon(Polygon p);
+    Result onPoint(Point p);
 }
